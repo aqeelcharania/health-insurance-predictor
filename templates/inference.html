@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+                    <form method="POST" action="/inference" >
+                        <div class="form-group">
+                            <label for="input">SEX:</label>
+                            <p><input type = "text" name = "sex" /></p>
+
+                        </div>
+						<div class="form-group">
+                            <label for="input">SMOKER (Yes/No):</label>
+                            <p><input type = "text" name = "smoker" /></p>
+                
+                        </div>
+                        <div class="form-group">
+                            <label for="input">REGION:</label>
+                            <p><input type = "text" name = "region" /></p>
+                            
+                        </div>
+						<div class="form-group">
+                            <label for="input">AGE:</label>
+                            <p><input type = "text" name = "age" /></p>
+                            
+                        </div>
+						<div class="form-group">
+                            <label for="input">BMI:</label>
+                            <p><input type = "text" name = "bmi" /></p>
+                            
+                        </div>
+						<div class="form-group">
+                            <label for="input">CHILDREN:</label>
+                            <p><input type = "text" name = "kid" /></p>
+                            <p><input type = "submit" value = "Submit" /></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="content">The insurance cost is:</label>
+                            <textarea name="display" placeholder="No Value"
+                                      class="form-control">{{ expense }}</textarea>
+                        </div>
+                        
+                    </form>
+{% endblock %}
