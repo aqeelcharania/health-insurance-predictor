@@ -1,21 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    deployment.kubernetes.io/revision: "1"
-  creationTimestamp: "2020-11-20T17:47:33Z"
-  generation: 3
   labels:
     app: insurance
   name: insurance
   namespace: default
-  resourceVersion: "4407"
-  selfLink: /apis/apps/v1/namespaces/default/deployments/insurance
-  uid: dbc9a212-2cf5-407a-b05c-7f6b8ab23846
 spec:
-  progressDeadlineSeconds: 600
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: insurance
@@ -26,38 +17,50 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: insurance
     spec:
       containers:
-      - image: gcr.io/insurance-295919/insurance:v1
-        imagePullPolicy: IfNotPresent
-        name: insurance
-        resources: {}
-        terminationMessagePath: /dev/termination-log
-        terminationMessagePolicy: File
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      securityContext: {}
-      terminationGracePeriodSeconds: 30
-status:
-  availableReplicas: 1
-  conditions:
-  - lastTransitionTime: "2020-11-20T17:48:24Z"
-    lastUpdateTime: "2020-11-20T17:48:24Z"
-    message: Deployment has minimum availability.
-    reason: MinimumReplicasAvailable
-    status: "True"
-    type: Available
-  - lastTransitionTime: "2020-11-20T17:47:33Z"
-    lastUpdateTime: "2020-11-20T17:48:24Z"
-    message: ReplicaSet "insurance-768b8dd7fb" has successfully progressed.
-    reason: NewReplicaSetAvailable
-    status: "True"
-    type: Progressing
-  observedGeneration: 3
-  readyReplicas: 1
-  replicas: 1
-  updatedReplicas: 1
+        - image: gcr.io/insurance-295919/github.com/dulzk/cloud-project
+          imagePullPolicy: IfNotPresent
+          name: insurance
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: insurance
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        targetAverageUtilization: 80
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: insurance
+---
+apiVersion: v1
+kind: Service
+metadata:
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app: insurance
+  name: insurance-service
+  namespace: default
+spec:
+  clusterIP: 10.15.243.162
+  externalTrafficPolicy: Cluster
+  ports:
+    - nodePort: 30501
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: insurance
+  sessionAffinity: None
+  type: LoadBalancer
